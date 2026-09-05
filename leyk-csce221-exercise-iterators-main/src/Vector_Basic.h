@@ -123,7 +123,7 @@ public:
 
         // Should return the element at the location offset from the iterator
         [[nodiscard]] reference operator[](difference_type offset) const noexcept { 
-            return _ptr + rhs._ptr;
+            return *(_ptr + offset);
         }
 
         // Used for comparing iterators
