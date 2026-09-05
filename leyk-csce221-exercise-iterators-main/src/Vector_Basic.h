@@ -117,10 +117,14 @@ public:
 
         // Should return the difference between two iterators. This should be the offset betweent the
         // elements in memory.
-        [[nodiscard]] difference_type operator-(const iterator& rhs) const noexcept { /* TODO */ }
+        [[nodiscard]] difference_type operator-(const iterator& rhs) const noexcept { 
+            return _ptr - rhs._ptr;
+        }
 
         // Should return the element at the location offset from the iterator
-        [[nodiscard]] reference operator[](difference_type offset) const noexcept { /* TODO */ }
+        [[nodiscard]] reference operator[](difference_type offset) const noexcept { 
+            return _ptr + rhs._ptr;
+        }
 
         // Used for comparing iterators
         // NOTE: This should be used to compare the iterators, not the elements they point to
