@@ -5,4 +5,4 @@ This repository serves multiple purposes:
 - Document my learning journey with C++
 - Document my progress on each problem as a proof I did not cheat
 
-** Note: I do not condone anyone copying or submitting any amount of my work as their own.
+** Note: I do not condone anyone copying or submitting any amount of my work as their own. **
