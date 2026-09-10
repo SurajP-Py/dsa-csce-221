@@ -15,19 +15,26 @@ private:
     size_t _capacity, _size;
 
     // You may want to write a function that grows the vector
-    void grow() { /* TODO */ }
+    void grow() { 
+        size_t new_capacity = (_capacity == 0) ? 1 : _capacity * 2;
+        T* new_array = new T[new_capacity];
+        for (size_t i = 0; i < _size; i++) new_array[i] = array[i];
+        delete[] array;
+        array = new_array;
+        _capacity = new_capacity;
+    }
 
 public:
     Vector() noexcept : array(nullptr), _capacity(0), _size(0) { /* TODO */ }
     Vector(size_t count, const T& value) : array(new T[count]), _capacity(count), _size(count)  {
-        for(int i = 0; i < count; ++i) array[i] = value;
+        for(size_t i = 0; i < count; ++i) array[i] = value;
     }
 
     // explicit prevents accidental conversions like Vector<int> v = 5;
     explicit Vector(size_t count) : array(new T[count]), _capacity(count), _size(count) { }
 
     Vector(const Vector& other) : array(new T[other._capacity]), _capacity(other._capacity), _size(other._size) { 
-        for(int i = 0; i < _size; ++i) array[i] = other.array[i];
+        for(size_t i = 0; i < _size; ++i) array[i] = other.array[i];
     }
     Vector(Vector&& other) noexcept : array(other.array), _capacity(other._capacity), _size(other._size) { 
         other.array = nullptr;
@@ -41,7 +48,7 @@ public:
         _capacity = other._capacity;
         _size = other._size;
         array = new T[_capacity];
-        for(int i = 0; i < _size; ++i) array[i] = other.array[i];
+        for(size_t i = 0; i < _size; ++i) array[i] = other.array[i];
     }
     Vector& operator=(Vector&& other) noexcept { 
         array = other.array;
@@ -77,13 +84,39 @@ public:
     T& back() { return array[_size - 1]; }
     const T& back() const { return array[_size - 1]; }
 
-    void push_back(const T& value) { /* TODO */ }
-    void push_back(T&& value) { /* TODO */ }
-    void pop_back() { /* TODO */ }
+    void push_back(const T& value) { 
+        if(_capacity == _size) {
+            grow();
+        }
+        array[_size] = value;
+        ++_size;
+    }
+    void push_back(T&& value) { 
+        if(_capacity == _size) {
+            grow();
+        }
+        array[_size] = value;
+        ++_size;
+    }
+    void pop_back() { 
+        --_size;
+    }
 
-    iterator insert(iterator pos, const T& value) { /* TODO */ }
-    iterator insert(iterator pos, T&& value) { /* TODO */ }
-    iterator insert(iterator pos, size_t count, const T& value) { /* TODO */ }
+    iterator insert(iterator pos, const T& value) { 
+        if(_capacity == _size) {
+            grow();
+        }
+    }
+    iterator insert(iterator pos, T&& value) { 
+        if(_capacity == _size) {
+            grow();
+        }
+    }
+    iterator insert(iterator pos, size_t count, const T& value) { 
+        if(_capacity == _size) {
+            grow();
+        }
+    }
     iterator erase(iterator pos) { /* TODO */ }
     iterator erase(iterator first, iterator last) { /* TODO */ }
 
