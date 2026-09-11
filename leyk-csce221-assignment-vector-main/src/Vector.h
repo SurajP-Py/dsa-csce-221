@@ -31,7 +31,7 @@ public:
     }
 
     // explicit prevents accidental conversions like Vector<int> v = 5;
-    explicit Vector(size_t count) : array(new T[count]), _capacity(count), _size(count) { }
+    explicit Vector(size_t count) : array(new T[count]()), _capacity(count), _size(count) { }
 
     Vector(const Vector& other) : array(new T[other._capacity]), _capacity(other._capacity), _size(other._size) { 
         for(size_t i = 0; i < _size; ++i) array[i] = other.array[i];
@@ -45,12 +45,25 @@ public:
     ~Vector() { delete[] array; }
 
     Vector& operator=(const Vector& other) { 
+        if (this == &other) {
+            return *this;
+        }
+        
+        delete[] array;
+
         _capacity = other._capacity;
         _size = other._size;
         array = new T[_capacity];
         for(size_t i = 0; i < _size; ++i) array[i] = other.array[i];
+        return *this;
     }
     Vector& operator=(Vector&& other) noexcept { 
+        if (this == &other) {
+            return *this;
+        }
+        
+        delete[] array;
+        
         array = other.array;
         _capacity = other._capacity;
         _size = other._size;
@@ -58,6 +71,8 @@ public:
         other.array = nullptr;
         other._capacity = 0;
         other._size = 0;
+
+        return *this;
     }
 
     iterator begin() noexcept { return iterator(array); }
@@ -95,7 +110,7 @@ public:
         if(_capacity == _size) {
             grow();
         }
-        array[_size] = value;
+        array[_size] = std::move(value);
         ++_size;
     }
     void pop_back() { 
