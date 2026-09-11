@@ -18,7 +18,7 @@ private:
     void grow() { 
         size_t new_capacity = (_capacity == 0) ? 1 : _capacity * 2;
         T* new_array = new T[new_capacity];
-        for (size_t i = 0; i < _size; i++) new_array[i] = array[i];
+        for (size_t i = 0; i < _size; i++) new_array[i] = std::move(array[i]);
         delete[] array;
         array = new_array;
         _capacity = new_capacity;
@@ -103,22 +103,73 @@ public:
     }
 
     iterator insert(iterator pos, const T& value) { 
+        size_t index = static_cast<size_t>(pos - begin());
         if(_capacity == _size) {
             grow();
+            for (size_t i = _size; i > index; --i) {
+                array[i] = std::move(array[i - 1]);
+            }
+            array[index] = std::move(value);
+        } else {
+            for (size_t i = _size; i > index; --i) {
+                array[i] = std::move(array[i - 1]);
+            }
+            array[index] = value;
         }
+        
+        ++_size;
+        return iterator(array + index);
     }
     iterator insert(iterator pos, T&& value) { 
+        size_t index = static_cast<size_t>(pos - begin());
         if(_capacity == _size) {
             grow();
         }
+
+        for (size_t i = _size; i > index; --i) {
+            array[i] = std::move(array[i - 1]);
+        }
+
+        array[index] = std::move(value);
+        
+        ++_size;
+        return iterator(array + index);
     }
     iterator insert(iterator pos, size_t count, const T& value) { 
-        if(_capacity == _size) {
-            grow();
+        size_t index = static_cast<size_t>(pos - begin());
+        
+        while (_size + count >  _capacity) grow();
+        
+        for (size_t i = _size; i > index; --i){
+            array[i + count - 1] = std::move(array[i - 1]);
         }
+        
+        for (size_t i = 0; i < count; ++i) {
+            array[index + i] = value;
+        }
+
+        _size += count;
+        return iterator(array + index);
     }
-    iterator erase(iterator pos) { /* TODO */ }
-    iterator erase(iterator first, iterator last) { /* TODO */ }
+    iterator erase(iterator pos) { 
+        size_t index = static_cast<size_t>(pos - begin());
+        for (size_t i = index; i < _size - 1; ++i) {
+            array[i] = std::move(array[i + 1]);
+        }
+        --_size;
+        return iterator(array + index);
+    }
+    iterator erase(iterator first, iterator last) { 
+        size_t index = static_cast<size_t>(first - begin());
+        size_t count = static_cast<size_t>(last - first);
+
+        for (size_t i = 0; i < _size - (index + count); ++i){
+            array[index + i] = std::move(array[index + i + count]);
+        }
+
+        _size -= count;
+        return iterator(array + index);
+    }
 
     class iterator {
     public:
@@ -225,7 +276,7 @@ public:
     };
 
 
-    void clear() noexcept { /* TODO */ }
+    void clear() noexcept { _size = 0; }
 };
 
 // This ensures at compile time that the deduced argument _Iterator is a Vector<T>::iterator
@@ -237,6 +288,6 @@ namespace {
 }
 
 template <typename _Iterator, bool _enable = is_vector_iterator<_Iterator>::value>
-[[nodiscard]] _Iterator operator+(typename _Iterator::difference_type offset, _Iterator const& iterator) noexcept { /* TODO */ }
+[[nodiscard]] _Iterator operator+(typename _Iterator::difference_type offset, _Iterator const& iterator) noexcept { return iterator + offset; }
 
 #endif
