@@ -43,7 +43,7 @@ namespace sort {
 
 			while(next != last_unsorted) {
 				if(comp(*next, *curr)) {
-					sort::swap(curr, next);
+					sort::swap(*curr, *next);
 					swapped = true;
 				}
 				curr = next;
@@ -56,10 +56,20 @@ namespace sort {
 	template<typename RandomIter, typename Comparator = less_for_iter<RandomIter>>
 	void insertion(RandomIter begin, RandomIter end, Comparator comp = Comparator{}) { 
 		if(begin == end) return;
+
+		for(RandomIter i = begin; i != end; ++i) {
+			RandomIter j = i;
+			while(j != begin && comp(*j, *std::prev(j))) {
+				sort::swap(*j, *std::prev(j));
+				j = std::prev(j);
+			}
+		}
 	}
 
 	template<typename RandomIter, typename Comparator = less_for_iter<RandomIter>>
 	void selection(RandomIter begin, RandomIter end, Comparator comp = Comparator{}) { 
+		if(begin == end) return;
+		
 		for(RandomIter i = begin; i != end; ++i) {
 			RandomIter currMin = i;
 
@@ -69,7 +79,7 @@ namespace sort {
 				}
 			}
 
-			if(currMin != i) sort::swap(i, currMin);
+			if(currMin != i) sort::swap(*i, *currMin);
 		}
 	}
 }
