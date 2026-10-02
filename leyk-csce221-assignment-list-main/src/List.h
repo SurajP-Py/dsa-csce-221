@@ -136,7 +136,6 @@ public:
     }
     List( const List& other ) : head(nullptr), tail(nullptr), _size(0) {
         // TODO - Don't forget initialize the list beforehand
-        if(other.head == nullptr) return;
 
         head.next = &tail;
         tail.prev = &head;
@@ -187,16 +186,19 @@ public:
     }
     List& operator=( List&& other ) noexcept {
         // TODO
-        if(other._size > 0) {
-            head.next = other.head.next;
-            tail.prev = other.tail.prev;
-            head.next->prev = &head;
-            tail.prev->next = &tail;
-            _size = other._size;
+        if(this != &other){ 
+            clear();
+            if(other._size > 0) {
+                head.next = other.head.next;
+                tail.prev = other.tail.prev;
+                head.next->prev = &head;
+                tail.prev->next = &tail;
+                _size = other._size;
 
-            other.head.next = &other.tail;
-            other.tail.prev = &other.head;
-            other._size =  0;
+                other.head.next = &other.tail;
+                other.tail.prev = &other.head;
+                other._size =  0;
+            }
         }
         return *this;
     }
