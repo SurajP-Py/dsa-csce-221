@@ -43,32 +43,39 @@ class BinarySearchTree
     key_compare comp;
 
   public:
-    BinarySearchTree() {
+    BinarySearchTree() : _root{ nullptr }, _size{ 0 }, comp{} {
         // TODO
     }
-    BinarySearchTree( const BinarySearchTree & rhs ) {
+    BinarySearchTree( const BinarySearchTree & rhs ) : _root{ nullptr}, _size{ rhs._size }, comp{ rhs.comp } {
         // TODO
+        _root = clone(rhs._root);
     }
-    BinarySearchTree( BinarySearchTree && rhs ) {
+    BinarySearchTree( BinarySearchTree && rhs ) : _root{ rhs._root }, _size{ rhs._size }, comp{ std::move(rhs.comp) }  {
         // TODO
+        rhs._root = nullptr;
+        rhs._size = 0;
     }
     ~BinarySearchTree() {
         // TODO
+        clear( _root );
     }
 
     const_reference min() const { return min( _root )->element; }
     const_reference max() const { return max( _root )->element; }
     const_reference root() const {
         // TODO
+        return _root->element;
     }
     bool contains( const key_type & x ) const { return contains( x, _root ); }
     value_type & find( const key_type & key ) { return find( key, _root )->element.second; }
     const value_type & find( const key_type & key ) const { return find( key, _root )->element.second; }
     bool empty() const {
         // TODO
+        return _size == 0;
     }
     size_type size() const {
         // TODO
+        return _size;
     }
 
     void clear() {
@@ -81,46 +88,127 @@ class BinarySearchTree
 
     BinarySearchTree & operator=( const BinarySearchTree & rhs ) {
         // TODO
+        if (this != &rhs) {
+            clear(_root);
+            _root = clone(rhs._root);
+            _size = rhs._size;
+            comp = rhs.comp;
+        }
+
+        return *this;
     }
     BinarySearchTree & operator=( BinarySearchTree && rhs ) {
         // TODO
+        if (this != &rhs) {
+            clear(_root);
+            _root = clone(rhs._root);
+            _size = rhs._size;
+            comp = std::move(rhs.comp);
+            rhs._root = nullptr;
+            rhs._size = 0;
+        }
+
+        return *this;
     }
 
   private:
     void insert( const_reference x, node_ptr & t ) {
         // TODO
+        if (t == nullptr) {
+            t = new node{x, nullptr, nullptr};
+            _size++;
+        } else if (comp(x.first, t->element.first)) {
+            insert(x, t->left);
+        } else if (comp(t->element.first, x.first)) {
+            insert(x, t->right);
+        }
     }
     void insert( pair && x, node_ptr & t ) {
         // TODO
+        if (t == nullptr) {
+            t = new node{std::move(x), nullptr, nullptr};
+            _size++;
+        } else if (comp(x.first, t->element.first)) {
+            insert(std::move(x), t->left);
+        } else if (comp(t->element.first, x.first)) {
+            insert(std::move(x), t->right);
+        }
     }
 
     void erase( const key_type & x, node_ptr & t ) {
         // TODO
+        if(t == nullptr) return;
+
+        if(comp(x, t->element.first)) erase(x, t->left);
+        else if(comp(t->element.first, x)) erase(x, t->right);
+        else if(t->left != nullptr && t->right != nullptr) {
+            node_ptr m = t->right;
+            while(m->left != nullptr) m = m->left;
+            t->element = m->element;
+            erase(t->element.first,  t->right);
+        } else {
+            node_ptr old = t;
+            t = (t->left != nullptr) ? t->left : t->right;
+            delete old;
+            _size--;
+        }
     }
 
     const_node_ptr min( const_node_ptr t ) const {
         // TODO
+        if(t == nullptr) return nullptr;
+        while(t->left != nullptr) t = t->left;
+        return t;
     }
     const_node_ptr max( const_node_ptr t ) const {
         // TODO
+        if(t == nullptr) return nullptr;
+        while(t->right != nullptr) t = t->right;
+        return t;
     }
 
     bool contains( const key_type & x, const_node_ptr t ) const {
         // TODO
+        while(t != nullptr){
+            if(comp(x, t->element.first)) t = t->left;
+            else if(comp(t->element.first, x)) t = t->right;
+            else return true;
+        }
+        return false;
     }
     node_ptr find( const key_type & key, node_ptr t ) {
         // TODO
+        while(t != nullptr){
+            if(comp(key, t->element.first)) t = t->left;
+            else if(comp(t->element.first, key)) t = t->right;
+            else return t;
+        }
+        return nullptr;
     }
     const_node_ptr find( const key_type & key, const_node_ptr t ) const {
         // TODO
+        while(t != nullptr){
+            if(comp(key, t->element.first)) t = t->left;
+            else if(comp(t->element.first, key)) t = t->right;
+            else return t;
+        }
+        return nullptr;
     }
 
     void clear( node_ptr & t ) {
         // TODO
+        if(t != nullptr) {
+            clear(t->left);
+            clear(t->right);
+            delete t;
+        }
+        t = nullptr;
     }
     
     node_ptr clone ( const_node_ptr t ) const {
         // TODO
+        if(t == nullptr) return nullptr;
+        return new node{t->element, clone(t->left), clone(t->right)};
     }
 
   public:
