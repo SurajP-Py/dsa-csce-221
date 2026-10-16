@@ -250,6 +250,36 @@ void printLevelByLevel( const BinarySearchTree<KK, VV, CC>& bst, std::ostream & 
     using const_node_ptr = typename BinarySearchTree<KK, VV, CC>::const_node_ptr;
     
     // TODO -- Guide in Instructions
+    if(bst._root == nullptr) return;
+
+    std::queue<const_node_ptr> q;
+    q.push(bst._root);
+
+    size_t level = 1;
+    bool more = true;
+
+    while(more) {
+        more = false;
+        for(size_t i = 0; i < level; ++i) {
+            const_node_ptr curr = q.front();
+            q.pop();
+
+            if(i > 0) out << ' ';
+
+            if(curr == nullptr) {
+                out << "null";
+                q.push(nullptr);
+                q.push(nullptr);
+            } else {
+                out << "(" << curr->element.first << ", " << curr->element.second << ")";
+                q.push(curr->left);
+                q.push(curr->right);
+                if(curr->left != nullptr || curr->right != nullptr) more = true;
+            }
+        }
+        out << '\n';
+        level *= 2;
+    }
 }
 
 template <typename KK, typename VV, typename CC>
