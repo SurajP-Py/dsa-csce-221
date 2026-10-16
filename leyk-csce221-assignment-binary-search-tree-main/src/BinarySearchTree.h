@@ -101,7 +101,7 @@ class BinarySearchTree
         // TODO
         if (this != &rhs) {
             clear(_root);
-            _root = clone(rhs._root);
+            _root = rhs._root;
             _size = rhs._size;
             comp = std::move(rhs.comp);
             rhs._root = nullptr;
@@ -121,7 +121,7 @@ class BinarySearchTree
             insert(x, t->left);
         } else if (comp(t->element.first, x.first)) {
             insert(x, t->right);
-        }
+        } else t->element.second = x.second;
     }
     void insert( pair && x, node_ptr & t ) {
         // TODO
@@ -132,7 +132,7 @@ class BinarySearchTree
             insert(std::move(x), t->left);
         } else if (comp(t->element.first, x.first)) {
             insert(std::move(x), t->right);
-        }
+        } else t->element.second = std::move(x.second);
     }
 
     void erase( const key_type & x, node_ptr & t ) {
